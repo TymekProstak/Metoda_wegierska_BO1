@@ -4,7 +4,27 @@ Maks:
 
 Tymek:
 -> Schemat ogólny algorytmu (redukcja całkowita, rozwiązanie)
+-> zadanie 2. dane itp.
 
 Michał
 -> Redukcja macierzy
 -> Algorytm wykreślania zer macierzy minimalną liczbą linii
+
+
+Zadanie 1.
+
+Jak algorytm działa kor po kroku:
+1. Redukcja macierzy,
+2. Schemat ogólny algorytmu (redukcja całkowita, rozwiązanie)
+3. Algorytm wyznaczania zer niezależnych
+4. Algorytm wykreślania zer macierzy minimalną liczbą linii
+5. Krok zwiększania liczby zer niezależnych
+
+
+Zadanie 2.
+Zadanie obliczeniowe – macierz kosztów przydziału - 6 (min) zadań/maszyn – dane
+powinny dawać pełna realizację algorytmu (z ze zwiększeniem liczby zer niezależnych)
+
+Wykonaj obliczenia dla zadania – pokaż macierze: początkową, pośrednie (każda
+zmiana, zbiory zer niezależnych, wykreślenia, dolne ograniczenie), rozwiązanie
+końcowe i optymalny koszt przydziału
