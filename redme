@@ -10,6 +10,7 @@ Michał
 -> Redukcja macierzy
 -> Algorytm wykreślania zer macierzy minimalną liczbą linii
 
+! struktura danych: macierz z numpy !
 
 Zadanie 1.
 
