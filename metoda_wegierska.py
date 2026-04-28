@@ -122,7 +122,61 @@ def find_independent_zeros(matrix: Matrix) -> List[Position]:
     Zwracana jest lista pozycji wybranych zer:
     [(0, 0), (5, 1), (4, 2), ...]
     """
-    raise NotImplementedError("Maks uzupełnia algorytm wyznaczania zer niezależnych.")
+    n, m = matrix.shape
+
+    # Dla każdego wiersza zapisujemy kolumny, w których są zera
+    zera_w_wierszach = []
+
+    for i in range(n):
+        kolumny_zer = []
+
+        for j in range(m):
+            if matrix[i, j] == 0:
+                kolumny_zer.append(j)
+
+        zera_w_wierszach.append(kolumny_zer)
+
+    # match_col[j] = numer wiersza, który ma przypisane zero w kolumnie j
+    # -1 oznacza, że kolumna nie jest jeszcze zajęta
+    match_col = [-1] * m
+
+    def znajdz_przypisanie(i: int, odwiedzone_kolumny: List[bool]) -> bool:
+        """
+        Próbuje przypisać wiersz i do jednej z kolumn z zerem.
+        Jeśli kolumna jest zajęta, próbujemy przepchnąć poprzedni wiersz
+        do innej kolumny.
+        """
+
+        for j in zera_w_wierszach[i]:
+
+            if odwiedzone_kolumny[j]:
+                continue
+
+            odwiedzone_kolumny[j] = True
+
+            if match_col[j] == -1 or znajdz_przypisanie(match_col[j], odwiedzone_kolumny):
+                match_col[j] = i
+                return True
+
+        return False
+
+    # Szukamy maksymalnego skojarzenia w grafie: wiersze -> kolumny z zerami
+    for i in range(n):
+        odwiedzone_kolumny = [False] * m
+        znajdz_przypisanie(i, odwiedzone_kolumny)
+
+    # Odczytujemy zera niezależne
+    independent_zeros = []
+
+    for j in range(m):
+        if match_col[j] != -1:
+            independent_zeros.append((match_col[j], j))
+
+    # Sortujemy, żeby wynik był czytelny
+    independent_zeros.sort()
+
+    return independent_zeros
+    # raise NotImplementedError("Maks uzupełnia algorytm wyznaczania zer niezależnych.")
 
 
 def increase_independent_zeros_step(matrix: Matrix,
@@ -142,7 +196,42 @@ def increase_independent_zeros_step(matrix: Matrix,
     - nowa macierz,
     - wartość h, czyli najmniejszy element niepokryty.
     """
-    raise NotImplementedError("Maks uzupełnia krok zwiększania liczby zer niezależnych.")
+    new_matrix = matrix.copy()
+
+    n, m = new_matrix.shape
+
+    rows_lines = set(line_cover.rows)
+    cols_lines = set(line_cover.cols)
+
+    # Szukamy elementów niepokrytych żadną linią
+    uncovered = []
+
+    for i in range(n):
+        for j in range(m):
+            if i not in rows_lines and j not in cols_lines:
+                uncovered.append(new_matrix[i, j])
+
+    if len(uncovered) == 0:
+        raise ValueError("Brak elementów niepokrytych liniami. Nie można wykonać kroku zwiększania.")
+
+    h = min(uncovered)
+
+    # Modyfikacja macierzy
+    for i in range(n):
+        for j in range(m):
+
+            # Element niepokryty żadną linią
+            if i not in rows_lines and j not in cols_lines:
+                new_matrix[i, j] -= h
+
+            # Element na przecięciu dwóch linii
+            elif i in rows_lines and j in cols_lines:
+                new_matrix[i, j] += h
+
+            # Element pokryty dokładnie jedną linią zostaje bez zmian
+
+    return new_matrix, h
+    # raise NotImplementedError("Maks uzupełnia krok zwiększania liczby zer niezależnych.")
 
 
 # ============================================================
