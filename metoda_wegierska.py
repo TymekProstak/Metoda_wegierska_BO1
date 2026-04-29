@@ -70,39 +70,81 @@ def create_cost_matrix() -> Matrix:
 def reduce_matrix(cost_matrix: Matrix) -> Tuple[Matrix, np.ndarray, np.ndarray, float]:
     """
     TODO: Michał
+    Redukcja macierzy:
+    - redukcja wierszy
+    - redukcja kolumn
 
-    Funkcja wykonuje redukcję całkowitą macierzy:
-    1. redukcję wierszy,
-    2. redukcję kolumn.
-
-    Zwracane są:
-    - macierz po redukcji,
-    - wektor odjętych minimów wierszy,
-    - wektor odjętych minimów kolumn,
-    - dolne ograniczenie, czyli suma odjętych minimów.
-
-    lower_bound = suma_minimów_wierszy + suma_minimów_kolumn
+    Zwraca:
+    - macierz po redukcji
+    - minima wierszy
+    - minima kolumn
+    - dolne ograniczenie
     """
-    raise NotImplementedError("Michał uzupełnia redukcję macierzy.")
+    m = cost_matrix.copy()
+
+    # Redukcja wierszy
+    row_min = m.min(axis=1)
+    m = m - row_min[:, np.newaxis]
+
+    # Redukcja kolumn
+    col_min = m.min(axis=0)
+    m = m - col_min
+
+    # Dolne ograniczenie
+    lower_bound = float(np.sum(row_min) + np.sum(col_min))
+
+    return m, row_min, col_min, lower_bound
 
 
 def cover_zeros_with_min_lines(matrix: Matrix,
                                independent_zeros: List[Position]) -> LineCover:
-    """
-    TODO: Michał
+    n = matrix.shape[0]
 
-    Funkcja wykreśla wszystkie zera minimalną liczbą linii.
+    zeros = (matrix == 0)
 
-    Zwracane są:
-    - zbiór indeksów wierszy wykreślonych liniami,
-    - zbiór indeksów kolumn wykreślonych liniami.
+    # ===== 1. Odtworzenie matchingu =====
+    match_row = [-1] * n
+    match_col = [-1] * n
 
-    Przykład:
-    LineCover(rows={0, 1, 4, 5}, cols={4})
-    oznacza, że wykreślono wiersze 1, 2, 5, 6 oraz kolumnę 5
-    w zapisie matematycznym, czyli po przeliczeniu z indeksów Pythona.
-    """
-    raise NotImplementedError("Michał uzupełnia wykreślanie zer minimalną liczbą linii.")
+    for r, c in independent_zeros:
+        match_row[r] = c
+        match_col[c] = r
+
+    # ===== 2. Procedura znakowania =====
+    marked_rows = [False] * n
+    marked_cols = [False] * n
+
+    # Zaznacz wiersze bez przypisanego zera
+    for r in range(n):
+        if match_row[r] == -1:
+            marked_rows[r] = True
+
+    changed = True
+    while changed:
+        changed = False
+
+        # zaznacz kolumny z zerami w zaznaczonych wierszach
+        for r in range(n):
+            if marked_rows[r]:
+                for c in range(n):
+                    if zeros[r, c] and not marked_cols[c]:
+                        marked_cols[c] = True
+                        changed = True
+
+        # zaznacz wiersze przypisane do tych kolumn
+        for c in range(n):
+            if marked_cols[c]:
+                r = match_col[c]
+                if r != -1 and not marked_rows[r]:
+                    marked_rows[r] = True
+                    changed = True
+
+    # ===== 3. Wyznaczenie linii =====
+    rows = {i for i in range(n) if not marked_rows[i]}
+    cols = {j for j in range(n) if marked_cols[j]}
+
+    return LineCover(rows=rows, cols=cols)
+
 
 
 # ============================================================
